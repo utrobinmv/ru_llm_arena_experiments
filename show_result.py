@@ -16,10 +16,10 @@ from utils import load_questions, load_model_answers
 from rich.console import Console
 from rich.table import Table
 
-BASELINE_MODEL_NAME = "gpt-3.5-turbo-0125"
+#BASELINE_MODEL_NAME = "gpt-3.5-turbo-0125"
 
 
-def compute_ratings(df: pd.DataFrame, initial: float = 1000., base: float = 10.,
+def compute_ratings(baseline_model, df: pd.DataFrame, initial: float = 1000., base: float = 10.,
                     scale: float = 400.) -> 'pd.Series[str]':
     df = df.copy()
 
@@ -40,16 +40,16 @@ def compute_ratings(df: pd.DataFrame, initial: float = 1000., base: float = 10.,
 
     scores = initial + np.log(result.scores) / np.log(base) * scale
 
-    if BASELINE_MODEL_NAME in scores.index:
-        scores += initial - scores[BASELINE_MODEL_NAME]
+    if baseline_model in scores.index:
+        scores += initial - scores[baseline_model]
 
     return scores.sort_values(ascending=False, kind="stable")
 
 
-def get_bootstrap_result(battles, func_compute_ratings, num_round):
+def get_bootstrap_result(battles, baseline_model, func_compute_ratings, num_round):
     rows = []
     for i in tqdm(range(num_round), desc="bootstrap"):
-        rows.append(func_compute_ratings(battles.sample(frac=1.0, replace=True, random_state=i)))
+        rows.append(func_compute_ratings(baseline_model, battles.sample(frac=1.0, replace=True, random_state=i)))
     df = pd.DataFrame(rows)
     return df[df.median().sort_values(ascending=False).index]
 
@@ -95,18 +95,18 @@ def predict_win_rate(ratings: dict[str, float], scale: float = 400., base: float
     return df
 
 
-def get_win_rate_column(df, column, baseline=BASELINE_MODEL_NAME):
+def get_win_rate_column(df, column, baseline):
     to_dict = df[["model", column]].set_index("model").to_dict()[column]
     win_rate_table = predict_win_rate(to_dict)
     return win_rate_table[baseline].fillna(0.5).apply(lambda x: round(x * 100, 2))
 
 
-def get_battles_from_judgment(judge_name, answers_lengths, first_game_only=False, WEIGHT=3, length_controlled=False):
+def get_battles_from_judgment(bench_name, judge_name, baseline_model, answers_lengths, first_game_only=False, WEIGHT=3, length_controlled=False):
     arena_hard_battles = pd.DataFrame()
 
     print("Turning judgment results into battles...")
 
-    directory = f"data/arena-hard-v0.1/model_judgment/{judge_name}"
+    directory = f"data/{bench_name}/model_judgment/{judge_name}"
     assert os.path.exists(directory)
     for file in tqdm(glob(f"{directory}/*jsonl")):
         df = pd.read_json(file, lines=True)
@@ -114,8 +114,8 @@ def get_battles_from_judgment(judge_name, answers_lengths, first_game_only=False
         for _, row in df.iterrows():
             if length_controlled:
                 _model_name = row["model"].split('/')[-1]
-                answers_length_deltas = (answers_lengths.loc[BASELINE_MODEL_NAME] - answers_lengths.loc[_model_name])
-                answer_length_delta = (answers_lengths.loc[BASELINE_MODEL_NAME][row["question_id"]] -
+                answers_length_deltas = (answers_lengths.loc[baseline_model] - answers_lengths.loc[_model_name])
+                answer_length_delta = (answers_lengths.loc[baseline_model][row["question_id"]] -
                                        answers_lengths.loc[_model_name][row["question_id"]])
                 normalized_answer_delta_weight = expit(answer_length_delta / answers_length_deltas.std())
             else:
@@ -124,7 +124,7 @@ def get_battles_from_judgment(judge_name, answers_lengths, first_game_only=False
             # game 1
             output = {
                 "question_id": row["question_id"],
-                "model_a": BASELINE_MODEL_NAME,
+                "model_a": baseline_model,
                 "model_b": row["model"],
                 "answer_len_delta": 0.5
             }
@@ -156,7 +156,7 @@ def get_battles_from_judgment(judge_name, answers_lengths, first_game_only=False
                 # game 2
                 output = {
                     "question_id": row["question_id"],
-                    "model_a": BASELINE_MODEL_NAME,
+                    "model_a": baseline_model,
                     "model_b": row["model"],
                     "answer_len_delta": 0.5
                 }
@@ -205,7 +205,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--bench-name", type=str, default="arena-hard-v0.1")
     parser.add_argument("--judge-name", type=str, default="gpt-4-1106-preview")
-    parser.add_argument("--baseline", type=str, default=BASELINE_MODEL_NAME)
+    parser.add_argument("--baseline", type=str, default="gpt-3.5-turbo-0125")
     parser.add_argument("--load-battles", action="store_true")
     parser.add_argument("--load-bootstrap", action="store_true")
     parser.add_argument("--show-elo", action="store_true")
@@ -231,17 +231,17 @@ if __name__ == "__main__":
         assert os.path.exists("data/arena_hard_battles.jsonl")
         battles = pd.read_json("data/arena_hard_battles.jsonl", lines=True)
     else:
-        battles = get_battles_from_judgment(args.judge_name, models_answers_lengths, args.first_game_only, args.weight,
+        battles = get_battles_from_judgment(args.bench_name, args.judge_name, args.baseline, models_answers_lengths, args.first_game_only, args.weight,
                                             args.length_control)
 
-    bootstrap_ratings = compute_ratings(battles)
+    bootstrap_ratings = compute_ratings(args.baseline, battles)
 
     models_names = bootstrap_ratings.index
 
     if args.load_bootstrap:
         bootstrap_ratings_lu = pd.read_json("data/bootstrapping_results.jsonl", lines=True)
     else:
-        bootstrap_ratings_lu = get_bootstrap_result(battles, compute_ratings, args.num_rounds)
+        bootstrap_ratings_lu = get_bootstrap_result(battles, args.baseline, compute_ratings, args.num_rounds)
         bootstrap_ratings_lu.to_json("data/bootstrapping_results.jsonl", lines=True, orient="records")
 
     stats = pd.DataFrame()

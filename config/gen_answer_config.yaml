@@ -8,9 +8,14 @@ num_choices: 1
 
 # a list of model to generate answers
 model_list:
-  - gpt-3.5-turbo-0125
-  - gpt-4-1106-preview
-  - gigachat_lite
-  - gigachat_pro
-  - gpt-4o-mini
-  - gpt-3.5-turbo-1106
+  - IlyaGusev_saiga_yandexgpt_8b
+  - saiga_yandexgpt_8b_sft_m4_jf_train_full
+  - saiga_yandexgpt_8b_smpo_m3_full
+  - gemma-2-9b-it-AWQ
+  - qwen2.5:7b-instruct-q4_K_M
+  - mistral-nemo:12b-instruct-2407-q4_0
+  - mistral-nemo:12b-instruct-2407-q4_K_M
+  - qwen2.5:14b-instruct-q4_K_M
+  - llama3:8b-instruct-q4_K_M
+  - mistral:7b-instruct-v0.3-q4_K_M
+  - gemma-2-9b-it

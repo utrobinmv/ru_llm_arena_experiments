@@ -1,0 +1,81 @@
+name: judgment config file for traslate_alpaca_small
+
+bench_name: traslate_alpaca_small
+
+# Arena Hard default
+judge_model: mistral-nemo:12b-instruct-2407-q4_0
+reference: False # Optional
+ref_model: null  
+
+baseline: True
+baseline_model: reference
+
+pairwise: True
+temperature: 0
+max_tokens: 4096
+
+regex_pattern: \[\[([AB<>=]+)\]\]
+
+system_prompt: "Please act as an impartial judge and evaluate the quality of the responses provided by two AI assistants to the user prompt displayed below. You will be given assistant A's answer and assistant B's answer. Your job is to evaluate which assistant's answer is better."
+
+prompt_template: ["<|User Prompt|>\n{question_1}\n\n<|The Start of Assistant A's Answer|>\n{answer_1}\n<|The End of Assistant A's Answer|>\n\n<|The Start of Assistant B's Answer|>\n{answer_2}\n<|The End of Assistant B's Answer|>
+
+Begin your evaluation by describing the key aspects that need to be considered when translating this type of text. Specifically, focus on the following criteria:
+
+1. **Accuracy of Translation:** The translation should accurately convey the meaning of the original text without introducing errors, omissions, or distortions.
+2. **Preservation of Format:** For Markdown documents, HTML code, and source code, ensure that the formatting, structure, and syntax are preserved exactly as in the original text. This includes maintaining Markdown symbols, HTML tags, and code integrity.
+3. **Comment Translation in Code:** Only comments within the code should be translated, while the actual code remains unchanged. Ensure that the translated comments are contextually accurate and maintain readability.
+4. **Line Breaks and Spacing:** All line breaks, empty lines, and spacing must be preserved as they appear in the original text.
+5. **Style and Tone:** The translation should match the style and tone of the original text (e.g., formal, technical, conversational). Specialized terminology should be translated correctly and consistently with accepted conventions.
+6. **Linguistic Quality:** The translation should be grammatically correct, natural-sounding, and free of awkward phrasing in Russian.
+
+After outlining these considerations, compare both assistants' translations against these criteria. Identify and explain any mistakes, inaccuracies, or areas where one assistant outperforms the other. Highlight specific examples from the translations to support your evaluation.
+
+Then, assess whether each assistant’s translation meets the following standards:
+- **Helpful:** Does the translation correctly respond to the task requirements?
+- **Relevant:** Are all parts of the translation appropriate and closely connected to the original text?
+- **Concise:** Is the translation clear and not unnecessarily verbose?
+- **Linguistically Acceptable:** Is the translation primarily in Russian, grammatically correct, and free of errors?
+
+Finally, consider if there are any additional improvements or missing elements in the translations that would enhance their quality.
+
+After providing your detailed explanation, you must output only one of the following choices as your final verdict with a label:
+
+1. Assistant A is significantly better: [[A>>B]]
+2. Assistant A is slightly better: [[A>B]]
+3. Tie, relatively the same: [[A=B]]
+4. Assistant B is slightly better: [[B>A]]
+5. Assistant B is significantly better: [[B>>A]]
+
+Example output: \"My final verdict is tie: [[A=B]]\"."]
+
+# Add your model below for evaluation
+model_list:
+  - qwen2.5:7b-instruct-q4_K_M
+  - gemma3:12b-it-q4_K_M
+  - qwen2.5:14b-instruct-q4_K_M
+  - mistral-nemo:12b-instruct-2407-q4_0
+  - gemma2:9b-instruct-q4_0
+  - command-r7b:7b-12-2024-q4_K_M
+  - deepseek-v2:16b-lite-chat-q4_0
+  - phi3:14b-medium-4k-instruct-q4_0
+  - llama2:13b-text-q4_0
+  - gemma:7b-instruct-v1.1-q4_K_M
+  - qwen2.5:0.5b-instruct-fp16
+  - qwen2.5:3b-instruct-fp16
+  - qwen2.5:3b-instruct-q8_0
+  - qwen2.5:3b-instruct-q4_K_M
+  - qwen2.5:1.5b-instruct-q4_K_M
+  - qwen2.5:0.5b-base-q4_K_M
+  - qwen2.5-coder:3b-base-q4_K_M
+  - qwen2.5-coder:1.5b-base-q4_K_M
+  - qwen2.5-coder:0.5b-base-q8_0
+  - qwen2.5-coder:7b-base-q4_K_M
+  - qwen2.5-coder:14b-base-q4_K_M
+  - llama3:8b-instruct-q4_0
+  - phi4:14b-q4_K_M
+  - mistral:7b-instruct-v0.3-q4_K_M
+  - mistral:7b-instruct-v0.2-q4_K_M
+  - mistral:7b-instruct-q4_K_M
+  - llama3.1:8b-instruct-q4_K_M
+  - mistral-nemo:12b-instruct-2407-q4_0

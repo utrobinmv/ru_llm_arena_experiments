@@ -163,3 +163,11 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
+
+#utrobinmv
+data/arena-hard-v0.1/model_answer
+data/arena-hard-v0.1/model_judgment
+data/arena-hard-v0.1/model_answer_real
+data/traslate_alpaca_small/model_answer
+data/traslate_alpaca_small/model_judgment
+.vscode/

@@ -1,0 +1,39 @@
+name: config of answer generation for traslate_alpaca_small
+
+bench_name: traslate_alpaca_small
+
+temperature: 0.0
+max_tokens: 8192
+num_choices: 1
+
+# a list of model to generate answers
+model_list:
+  - qwen2.5:7b-instruct-q4_K_M
+  - gemma3:12b-it-q4_K_M
+  - qwen2.5:14b-instruct-q4_K_M
+  - mistral-nemo:12b-instruct-2407-q4_0
+  - gemma2:9b-instruct-q4_0
+  - command-r7b:7b-12-2024-q4_K_M
+  - deepseek-v2:16b-lite-chat-q4_0
+  - phi3:14b-medium-4k-instruct-q4_0
+  - llama2:13b-text-q4_0
+  - gemma:7b-instruct-v1.1-q4_K_M
+  - qwen2.5:0.5b-instruct-fp16
+  - qwen2.5:3b-instruct-fp16
+  - qwen2.5:3b-instruct-q8_0
+  - qwen2.5:3b-instruct-q4_K_M
+  - qwen2.5:1.5b-instruct-q4_K_M
+  - qwen2.5:0.5b-base-q4_K_M
+  - qwen2.5-coder:3b-base-q4_K_M
+  - qwen2.5-coder:1.5b-base-q4_K_M
+  - qwen2.5-coder:0.5b-base-q8_0
+  - qwen2.5-coder:7b-base-q4_K_M
+  - qwen2.5-coder:14b-base-q4_K_M
+  - llama3:8b-instruct-q4_0
+  - phi4:14b-q4_K_M
+  - mistral:7b-instruct-v0.3-q4_K_M
+  - mistral:7b-instruct-v0.2-q4_K_M
+  - mistral:7b-instruct-q4_K_M
+  - llama3.1:8b-instruct-q4_K_M
+  - mistral-nemo:12b-instruct-2407-q4_0
+
